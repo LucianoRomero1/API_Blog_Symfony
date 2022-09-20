@@ -1,0 +1,5 @@
+
+# create_article:
+#   path: /article/create
+#   controller: App\Controller\ArticleController::create
+
