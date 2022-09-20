@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Handler\ArticleHandler;
 use App\Handler\ResponseHandler;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,21 +27,18 @@ class ArticleController extends AbstractController
     /**
      * @Route("/create", name="create_article")
      */
-    public function create(Request $request){
+    public function create(ManagerRegistry $em, Request $request){
+        $data = $request->request->all(); 
+        
+        $image = $request->files->get('image');
 
-        $json = $request->get('json', null);
-        if(is_null($json)){
-            $response = $this->responseHandler->errorResponse("error", "400", "Params failed");
+        try {
+            $this->articleHandler->validateParams($data, $image);
+            //Setter a la entidad
+        } catch (\Exception $e) {
+            $response = $this->responseHandler->errorResponse("error", "400", $e->getMessage());
             return $response;
         }
-
-        $params = json_decode($json);
-        if(!$this->articleHandler->validateParams($params)){
-            $response = $this->responseHandler->errorResponse("error", "400", "Invalid params");
-            return $response;
-        }
-
-        //Aca tengo que hacer el set de la entidad
     }
 
     /**
