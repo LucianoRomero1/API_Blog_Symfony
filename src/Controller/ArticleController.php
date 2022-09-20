@@ -27,18 +27,24 @@ class ArticleController extends AbstractController
     /**
      * @Route("/create", name="create_article")
      */
-    public function create(ManagerRegistry $em, Request $request){
-        $data = $request->request->all(); 
+    public function create(ManagerRegistry $manager, Request $request){
+        $em     = $manager->getManager();
+        $data   = $request->request->all(); 
         
-        $image = $request->files->get('image');
+        $image  = $request->files->get('image');
 
         try {
             $this->articleHandler->validateParams($data, $image);
-            //Setter a la entidad
+            $article = $this->articleHandler->setArticle($em, $data, $image);
+            dd($article);
         } catch (\Exception $e) {
-            $response = $this->responseHandler->errorResponse("error", "400", $e->getMessage());
+            $response = $this->responseHandler->errorResponse($e->getMessage());
             return $response;
         }
+
+        $message = 'Article has been created successfully';
+        return $this->responseHandler->successResponse($message, $article);
+        
     }
 
     /**

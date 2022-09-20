@@ -36,12 +36,9 @@ class ArticleHandler extends AbstractController{
         return true;
     }
 
-    public function validateImage($image){    
+    public function validateImage($image){   
         $ext = $image->guessExtension();
         if($ext == "jpg" || $ext == "jpeg" || $ext == "png"){
-            $image_name = "article_".time().'.'.$ext;
-            $image->move("uploads/articles", $image_name);
-        
             return true;
         }
 
@@ -49,17 +46,33 @@ class ArticleHandler extends AbstractController{
     }
 
     //Esta funcion la voy a usar tanto para editar como para crear
-    public function setArticle($em, $data){
+    public function setArticle($em, $data, $image){
         $title      = $data['title'];
         $content    = $data['content'];
+        $image_name = $this->setImageArticle($image);
 
-        $article = new Article();
+        $article    = new Article();
         $article->setTitle($title);
         $article->setContent($content);
         $article->setDate(new \DateTime('now'));
+        $article->setImage($image_name);
 
+        $em->persist($article);
+        $flush = $em->flush();
+
+        if(!is_null($flush)){
+            throw new Exception('Article can´t be created');
+        }
+
+        return $article;
     }
 
-    
+    public function setImageArticle($image){
+        $ext        = $image->guessExtension();
+        $image_name = "article_".time().'.'.$ext;
+        $image->move("uploads/articles", $image_name);
+
+        return $image_name;
+    }
 
 }

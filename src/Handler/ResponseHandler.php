@@ -16,22 +16,22 @@ class ResponseHandler extends AbstractController{
         return true;
     }
 
-    public function errorResponse($result, $code, $message){
+    public function errorResponse($message){
         $response = new JsonResponse();
         $response->setData([
-            "status"    => $result,
-            "code"      => $code,
+            "status"    => 'error',
+            "code"      => 400,
             "message"   => $message
         ]);
 
         return $response;
     }
 
-    public function successResponse($result, $code, $message, $data){
+    public function successResponse($message, $data){
         $response = new JsonResponse();
         $response->setData([
-            "status"    => $result,
-            "code"      => $code,
+            "status"    => 'success',
+            "code"      => 200,
             "message"   => $message,
             "data"      => $data
         ]);
