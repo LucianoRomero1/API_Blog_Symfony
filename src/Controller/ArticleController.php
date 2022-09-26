@@ -60,8 +60,8 @@ class ArticleController extends AbstractController
      * @Route("/get_one/{id}", name="get_one_article")
      */
     public function getOne(ManagerRegistry $manager, $id = null){
-        $em     = $manager->getManager();
-        $article = $em->getRepository(Article::class)->findOneBy(["id"=>$id]);
+        $em         = $manager->getManager();
+        $article    = $this->articleHandler->findArticleById($em, $id);
         if(is_null($article)){
             return $this->responseHandler->errorResponse("Article not found");
         }
@@ -73,7 +73,26 @@ class ArticleController extends AbstractController
      * @Route("/edit/{id}", name="edit_article")
      */
     public function edit(ManagerRegistry $manager, Request $request, $id = null){
+        $em         = $manager->getManager();
+
+        $article    = $this->articleHandler->findArticleById($em, $id);
+        if(is_null($article)){
+            return $this->responseHandler->errorResponse("Article not found");
+        }
         
+        $data   = $request->request->all(); 
+        $image  = $request->files->get('image');
+
+        try {
+            $this->articleHandler->validateParams($data, $image);
+            $article = $this->articleHandler->setArticle($em, $data, $image, $article);
+        } catch (\Exception $e) {
+            $response = $this->responseHandler->errorResponse($e->getMessage());
+            return $response;
+        }
+
+        $message = 'Article has been edited successfully';
+        return $this->responseHandler->successResponse($article, $message);
     }
 
     /**

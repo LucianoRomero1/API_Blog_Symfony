@@ -46,12 +46,14 @@ class ArticleHandler extends AbstractController{
     }
 
     //Esta funcion la voy a usar tanto para editar como para crear
-    public function setArticle($em, $data, $image){
+    public function setArticle($em, $data, $image, $article = null){
         $title      = $data['title'];
         $content    = $data['content'];
         $image_name = $this->setImageArticle($image);
 
-        $article    = new Article();
+        if(is_null($article)){
+            $article    = new Article();
+        }
         $article->setTitle($title);
         $article->setContent($content);
         $article->setDate(new \DateTime('now'));
@@ -73,6 +75,12 @@ class ArticleHandler extends AbstractController{
         $image->move("uploads/articles", $image_name);
 
         return $image_name;
+    }
+
+    public function findArticleById($em, $id){
+        $article = $em->getRepository(Article::class)->findOneBy(["id"=>$id]);
+
+        return $article;
     }
 
 }
