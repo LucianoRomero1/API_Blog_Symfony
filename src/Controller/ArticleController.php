@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Article;
 use App\Handler\ArticleHandler;
 use App\Handler\ResponseHandler;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,35 +44,42 @@ class ArticleController extends AbstractController
         }
 
         $message = 'Article has been created successfully';
-        return $this->responseHandler->successResponse($message, $article);
+        return $this->responseHandler->successResponse($article, $message);
         
     }
 
     /**
      * @Route("/get_all", name="get_all_articles")
      */
-    public function getAll(){
-
+    public function getAll(ManagerRegistry $manager){
+        $em     = $manager->getManager();
+        //Tendria que traerlas paginadas
     }
 
     /**
-     * @Route("/get_one", name="get_one_article")
+     * @Route("/get_one/{id}", name="get_one_article")
      */
-    public function getOne(){
+    public function getOne(ManagerRegistry $manager, $id = null){
+        $em     = $manager->getManager();
+        $article = $em->getRepository(Article::class)->findOneBy(["id"=>$id]);
+        if(is_null($article)){
+            return $this->responseHandler->errorResponse("Article not found");
+        }
 
+        return $this->responseHandler->successResponse($article);
     }
 
     /**
      * @Route("/edit/{id}", name="edit_article")
      */
-    public function edit(Request $request, $id = null){
+    public function edit(ManagerRegistry $manager, Request $request, $id = null){
         
     }
 
     /**
      * @Route("/delete/{id}", name="delete_article")
      */
-    public function delete(Request $request, $id = null){
+    public function delete(ManagerRegistry $manager, Request $request, $id = null){
         
     }
 }
