@@ -128,9 +128,9 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="delete_article", methods={"POST"})
+     * @Route("/delete/{id}", name="delete_article", methods={"DELETE"})
      */
-    public function delete(ManagerRegistry $manager, Request $request, $id = null)
+    public function delete(ManagerRegistry $manager, $id = null)
     {
         $em         = $manager->getManager();
 
