@@ -6,6 +6,7 @@ use App\Entity\Article;
 use App\Handler\ResponseHandler;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ArticleHandler extends AbstractController{
 

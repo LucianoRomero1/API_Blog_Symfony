@@ -4,6 +4,11 @@ namespace App\Handler;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
 class ResponseHandler extends AbstractController{
 
@@ -33,10 +38,27 @@ class ResponseHandler extends AbstractController{
             "status"    => 'success',
             "code"      => 200,
             "message"   => $message,
-            "data"      => $data
+            "data"      => $this->serializer($data)
         ]);
 
         return $response;
     }
 
+      /* 
+    *   Convierta cualquier entidad a JSON.
+    */
+    public function serializer($entity){
+        $encoders    = [new XmlEncoder(), new JsonEncoder()];
+        $defaultContext = [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($subEntities, $format, $context) {
+                return $subEntities;
+            },
+        ];
+        $normalizers = [new ObjectNormalizer(null, null, null, null, null, null, $defaultContext)];
+        $serializer   = new Serializer($normalizers, $encoders);
+        return json_decode($serializer->serialize($entity, 'json'));
+
+    }
+
+    
 }
